@@ -1,0 +1,58 @@
+# MGTTS - Matt G's Text To Speech
+
+A command-line interface to request text to speech audio from a Wyoming server.
+
+I've got [Piper](https://github.com/linuxserver/docker-piper) running in a docker container, and wanted to easily try out different voices.
+
+# Requirements
+- Access to a TTS engine via Wyoming server
+- Python3
+- Audio Player: The script tries any of the following audio players
+    - SoX
+    - ffplay (part of ffmpeg)
+    - paplay
+    - afplay
+
+This has only been tested on Mac OS Sequoia 15.7.3
+
+## How To Use
+
+The only info that's required is:
+- Server address:port
+- Text
+
+`./mgtts --server 10.0.0.69:10200 "Hello World"`
+
+To make it cleaner, define the server and a default model in the config file
+```
+server=10.0.0.69:10200
+model=cy_GB-gwryw_gogleddol-medium
+```
+
+This will now use the defined server and model by default.
+`./mgtts "hello world"`
+
+But you can override these settings with the command-line options
+
+```
+usage: mgtts.py [-h] [-w SERVER:PORT] [-m MODEL] [-s SPEAKER] [-d] text
+
+Speak text via a Wyoming / Piper TTS server
+
+positional arguments:
+  text                          Text to speak
+
+options:
+  -h, --help                    show this help message and exit
+  -w, --wyoming SERVER:PORT     Wyoming TTS server address (host:port)
+  -m, --model MODEL             Model (voice) name to use
+  -s, --speaker SPEAKER         Speaker number or name
+  -d, --debug                   Print debug info to stderr
+  ```
+
+  Beware of `--speaker`. Many voice models only have one speaker, so you'll be best off leaving this blank, or at 0.
+
+  ## Piper Voices
+  If you're using Piper TTS, [rhasspy's Piper Voice Samples](https://rhasspy.github.io/piper-samples/#en_GB-vctk-medium) is a handy page to find a voice model that you'd like to use.
+
+  I've also included a CSV list of the [VCTK](https://datashare.ed.ac.uk/handle/10283/2950) speakers, with their descriptions and speaker numbers.
