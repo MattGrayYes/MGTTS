@@ -1,6 +1,6 @@
 # MGTTS - Matt G's Text To Speech
 
-I've got [Piper](https://github.com/linuxserver/docker-piper) running in a docker container, and wanted to easily try out different voices.
+I've got [Piper](https://github.com/linuxserver/docker-piper) running in a docker container, wanted to easily try out phrases in different voices, and couldn't find a simple UI for it.
 
 # Requirements
 - Access to a TTS engine via Wyoming server
