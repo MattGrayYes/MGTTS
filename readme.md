@@ -30,13 +30,18 @@ model=cy_GB-gwryw_gogleddol-medium
 ```
 
 This will now use the defined server and model by default.
+
 `./mgtts.py 'I love a bit of bara brith with my cup of tea.'`
 
 But you can override these settings with the command-line options
 
 `./mgtts.py --model en_GB-vctk-medium --speaker 23 'I like a nice thick slice of battenburg with mine!'`
 
-`./mgtts.py --model en_US-ljspeech-medium 'All I need is coffee and a high caliber rifle!'`
+`./mgtts.py --model en_US-ljspeech-medium -o gunsblazing.wav 'All I need is coffee and a high caliber rifle!'`
+
+### Command Line Options
+
+Beware of `--speaker`. Many voice models only have one speaker, so you'll be best off leaving this blank, or at 0.
 
 ```
 usage: mgtts.py [-h] [-w SERVER:PORT] [-m MODEL] [-s SPEAKER] [-d] text
@@ -53,10 +58,7 @@ options:
   -s, --speaker SPEAKER         Speaker number
   -o, --outfile FILE_PATH       Output audio as WAV file instead of playing
   -d, --debug                   Print debug info to stderr
-  ```
-
-  Beware of `--speaker`. Many voice models only have one speaker, so you'll be best off leaving this blank, or at 0.
-
+```
 ## Piper Voices
 If you're using Piper TTS, [rhasspy's Piper Voice Samples](https://rhasspy.github.io/piper-samples/#en_GB-vctk-medium) is a handy page to find a voice model that you'd like to use.
 
