@@ -1,7 +1,5 @@
 # MGTTS - Matt G's Text To Speech
 
-A command-line interface to request text to speech audio from a Wyoming server.
-
 I've got [Piper](https://github.com/linuxserver/docker-piper) running in a docker container, and wanted to easily try out different voices.
 
 # Requirements
