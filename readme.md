@@ -21,7 +21,7 @@ The only info that's required is:
 - Server address:port
 - Text
 
-`./mgtts --server 10.0.0.69:10200 "Hello World"`
+`./mgtts.py --server 10.0.0.69:10200 "Hello World"`
 
 To make it cleaner, define the server and a default model in the config file
 ```
@@ -30,9 +30,13 @@ model=cy_GB-gwryw_gogleddol-medium
 ```
 
 This will now use the defined server and model by default.
-`./mgtts "hello world"`
+`./mgtts.py 'I love a bit of bara brith with my cup of tea.'`
 
 But you can override these settings with the command-line options
+
+`./mgtts.py --model en_GB-vctk-medium --speaker 23 'I like a nice thick slice of battenburg with mine!'`
+
+`./mgtts.py --model en_US-ljspeech-medium 'All I need is coffee and a high caliber rifle!'`
 
 ```
 usage: mgtts.py [-h] [-w SERVER:PORT] [-m MODEL] [-s SPEAKER] [-d] text
