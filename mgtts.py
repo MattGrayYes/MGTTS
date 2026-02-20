@@ -77,13 +77,6 @@ def start_streaming_player(player, rate, width, channels, debug=False):
     bits = width * 8
     err = subprocess.PIPE if debug else subprocess.DEVNULL
 
-    if player == "sox":
-        return subprocess.Popen(
-            ["play", "-q", "-t", "raw", "-r", str(rate),
-             "-e", "signed-integer", "-b", str(bits), "-c", str(channels), "-"],
-            stdin=subprocess.PIPE, stderr=err,
-        )
-
     if player == "ffplay":
         ch_layout = {1: "mono", 2: "stereo"}.get(channels, f"{channels}c")
         loglevel = "warning" if debug else "quiet"
@@ -100,6 +93,13 @@ def start_streaming_player(player, rate, width, channels, debug=False):
         return subprocess.Popen(
             ["paplay", "--raw", f"--rate={rate}",
              f"--channels={channels}", f"--format={fmt_map.get(width, 's16le')}"],
+            stdin=subprocess.PIPE, stderr=err,
+        )
+    
+    if player == "sox":
+        return subprocess.Popen(
+            ["play", "-q", "-t", "raw", "-r", str(rate),
+             "-e", "signed-integer", "-b", str(bits), "-c", str(channels), "-"],
             stdin=subprocess.PIPE, stderr=err,
         )
 
@@ -119,10 +119,25 @@ def play_wav_buffer(pcm_data, rate, width, channels):
     finally:
         os.unlink(tmp)
 
+def save_wav_buffer(pcm_data, rate, width, channels, filename="output.wav"):
+    # Write a WAV temp file and save to the specified filename.
+    fd, tmp = tempfile.mkstemp(suffix=".wav")
+    try:
+        with wave.open(os.fdopen(fd, "wb"), "wb") as wf:
+            wf.setnchannels(channels)
+            wf.setsampwidth(width)
+            wf.setframerate(rate)
+            wf.writeframes(pcm_data)
+        # copy temp file to output file
+        shutil.copy(tmp, filename)
+        print(f"Saved audio to {filename}")
+    finally:
+        os.unlink(tmp)
+
 
 def load_config():
     # Load defaults from config file
-    cfg = {"server": None, "model": None, "speaker": None}
+    cfg = {"server": None, "model": None, "speaker": None, "outfile": None}
     if not os.path.exists(CONFIG_PATH):
         return cfg
     cp = configparser.ConfigParser()
@@ -147,6 +162,8 @@ def main():
                                        help="Model (voice) name to use")
     ap.add_argument("-s", "--speaker", metavar="SPEAKER", default=None,
                                        help="Speaker number or name")
+    ap.add_argument("-o", "--outfile", metavar="FILE_PATH", default=None,
+                                       help="Output audio as WAV file instead of playing")
     ap.add_argument("-d", "--debug", action="store_true",
                                        help="Print debug info to stderr")
     ap.add_argument("text", help="Text to speak")
@@ -156,6 +173,7 @@ def main():
     server = args.wyoming or cfg["server"]
     voice = args.model or cfg["model"]
     speaker = args.speaker or cfg["speaker"]
+    filename = args.outfile or cfg["outfile"]
 
     if not server:
         print(f"Error: no server specified. Use -w HOST:PORT or set server= in {CONFIG_PATH}",
@@ -176,22 +194,30 @@ def main():
             v["speaker"] = speaker
         synth_data["voice"] = v
 
-    # Pick an audio player: prefer streaming (sox > ffplay > paplay), fallback afplay
-    streaming = True
+
+    # Pick an audio player: prefer streaming (ffplay > paplay > sox), fallback afplay
     player = None
-    for name in ("sox", "ffplay", "paplay"):
-        binary = "play" if name == "sox" else name
-        if shutil.which(binary):
-            player = name
-            break
-    if player is None:
-        if shutil.which("afplay"):
-            player = "afplay"
-            streaming = False
-        else:
-            print("Error: no audio player found. Install sox: brew install sox",
-                  file=sys.stderr)
-            sys.exit(1)
+    output_wav = False
+
+    if filename:
+        streaming=False
+        output_wav=True
+    else:
+        for name in ("ffplay", "paplay", "sox"):
+            binary = "play" if name == "sox" else name
+            if shutil.which(binary):
+                player = name
+                streaming = True
+                break
+        if player is None:
+            if shutil.which("afplay"):
+                player = "afplay"
+                streaming = False
+            else:
+                print(f"Error: no audio player found. Saving audio file to {filename or 'output.wav'}",
+                    file=sys.stderr)
+                streaming = False
+                output_wav = True
 
     # Connect to the Wyoming server
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -259,7 +285,10 @@ def main():
                     else:
                         proc.wait()
                 elif pcm_buf and fmt:
-                    play_wav_buffer(bytes(pcm_buf), **fmt)
+                    if output_wav:
+                        save_wav_buffer(bytes(pcm_buf), **fmt, filename=filename or "output.wav")
+                    else:
+                        play_wav_buffer(bytes(pcm_buf), **fmt)
                 break
 
     except KeyboardInterrupt:

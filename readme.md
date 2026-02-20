@@ -7,11 +7,13 @@ I've got [Piper](https://github.com/linuxserver/docker-piper) running in a docke
 # Requirements
 - Access to a TTS engine via Wyoming server
 - Python3
-- Audio Player: The script tries any of the following audio players
+- Audio Player:
+  - The script tries any of the following audio players
     - SoX
     - ffplay (part of ffmpeg)
     - paplay
     - afplay
+  - If it fails, it will save a WAV file in the current directory
 
 This has only been tested on Mac OS Sequoia 15.7.3
 
@@ -46,7 +48,8 @@ options:
   -h, --help                    show this help message and exit
   -w, --wyoming SERVER:PORT     Wyoming TTS server address (host:port)
   -m, --model MODEL             Model (voice) name to use
-  -s, --speaker SPEAKER         Speaker number or name
+  -s, --speaker SPEAKER         Speaker number
+  -o, --outfile FILE_PATH       Output audio as WAV file instead of playing
   -d, --debug                   Print debug info to stderr
   ```
 
