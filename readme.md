@@ -2,7 +2,7 @@
 
 I've got [Piper](https://github.com/linuxserver/docker-piper) running in a docker container, wanted to easily try out phrases in different voices, and couldn't find a simple UI for it.
 
-# Requirements
+## Requirements
 - Access to a TTS engine via Wyoming server
 - Python3
 - Audio Player:
@@ -57,7 +57,10 @@ options:
 
   Beware of `--speaker`. Many voice models only have one speaker, so you'll be best off leaving this blank, or at 0.
 
-  ## Piper Voices
-  If you're using Piper TTS, [rhasspy's Piper Voice Samples](https://rhasspy.github.io/piper-samples/#en_GB-vctk-medium) is a handy page to find a voice model that you'd like to use.
+## Piper Voices
+If you're using Piper TTS, [rhasspy's Piper Voice Samples](https://rhasspy.github.io/piper-samples/#en_GB-vctk-medium) is a handy page to find a voice model that you'd like to use.
 
-  I've also included a CSV list of the [VCTK](https://datashare.ed.ac.uk/handle/10283/2950) speakers, with their descriptions and speaker numbers.
+I've also included a CSV list of the [VCTK](https://datashare.ed.ac.uk/handle/10283/2950) speakers, with their descriptions and speaker numbers.
+
+## AI Disclosure
+I made this with help from Claude Opus 4.6
